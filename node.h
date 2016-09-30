@@ -13,7 +13,7 @@ struct Node{
 	int y;
 	int f;
 	int g;
-	int h;
+	int h;	
 	int cost;
 	char cell_value;
 	Node* parent;
@@ -28,6 +28,7 @@ struct Node{
 
 Node* astar(Node** board);
 void findStart(Node** board, Node*& current_node, Node*& goal_node);
-int manhatten_distance(int x1, int x2, int y1, int y2);
+int manhatten_distance(Node*& current_node, Node*& goal_node);
+void find_successors(Node** board, Node*& current_node, Node*& goal_node);
 
 #endif
