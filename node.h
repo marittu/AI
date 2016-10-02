@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <iostream>
 
-#define WIDTH 20
-#define HEIGTH 7
+#define WIDTH 40
+#define HEIGTH 10
 
 enum States{UNKNOWN, OPEN, CLOSED};
 

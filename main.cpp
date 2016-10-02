@@ -13,7 +13,7 @@ int main(){
 		board[i] = new Node[HEIGTH];
 	}
 
-	getBoard(board, "boards/board-1-4.txt");
+	getBoard(board, "boards/board-2-3.txt");
 
 	cout << "Initial board" << endl;
 	for(int y = 0; y < HEIGTH; y++){
