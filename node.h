@@ -30,16 +30,11 @@ struct Node{
 
 
 
-Node* astar(Node** board);
+Node* solver(Node** board);
 void findStart(Node** board, Node*& current_node, Node*& goal_node);
 int manhatten_distance(Node*& current_node, Node*& goal_node);
 void find_successors(Node** board, Node*& current_node, Node*& goal_node);
 void find_kids(Node** board, Node*& current_node);
 void attatch_and_eval(Node*& successor, Node*& goal_node);
 void propagate_path_improvements(Node*& current_node);
-Node * dijkstra(Node** board);
-void find_successors_dijkstra(Node** board, Node*& current_node, Node*& goal_node);
-void propagate_dijkstra(Node*& current_node);
-Node* bfs(Node** board);
-void find_successors_bfs(Node** board, Node*& current_node, Node*& goal_node);
 #endif
