@@ -52,7 +52,7 @@ Node* astar(Node** board){
 	}
 }
 
-Node * dijkstra(Node** board){
+Node* dijkstra(Node** board){
 	Node* current_node;
 	Node* goal_node;
 
@@ -82,7 +82,42 @@ Node * dijkstra(Node** board){
 		current_node->state = CLOSED;
 		
 		find_kids(board, current_node);
-		find_successors(board, current_node, goal_node);	
+		find_successors_dijkstra(board, current_node, goal_node);	
+	}
+}
+
+Node* bfs(Node** board){
+	Node* current_node;
+	Node* goal_node;
+
+	findStart(board, current_node, goal_node);
+	open.push_front(current_node);
+
+	bool solution = false;
+	
+	while(!solution){
+		if(open.empty()){
+			cout << "No path found..." << endl;
+			return NULL;
+		}
+		current_node = *(open.begin());
+		open.remove(current_node);
+		
+		if(current_node == goal_node){
+			solution = true;
+			return current_node;
+		}
+		
+		closed.push_back(current_node);
+		if (current_node->cell_value != 'A' && current_node->cell_value != 'B'){
+			current_node->cell_value = 'x';	
+		}
+		
+		current_node->state = CLOSED;
+		
+		find_kids(board, current_node);
+		find_successors_bfs(board, current_node, goal_node);	
+	}
 }
 
 int manhatten_distance(Node*& current_node, Node*& goal_node){
@@ -181,7 +216,7 @@ void find_successors_dijkstra(Node** board, Node*& current_node, Node*& goal_nod
 
 			if(successor->state == UNKNOWN){
 				successor->parent = current_node;
-				attatch_and_eval(successor, goal_node);
+				successor->g = successor->cost + successor->parent->g;
 				if (open.empty()){
 					open.push_back(successor);
 					if (successor->cell_value != 'A' && successor->cell_value != 'B'){
@@ -207,10 +242,29 @@ void find_successors_dijkstra(Node** board, Node*& current_node, Node*& goal_nod
 			}
 			else if(successor->cost + current_node->g < successor->g){
 				successor->parent = current_node;
-				attatch_and_eval(successor, goal_node);
+				successor->g = successor->cost + successor->parent->g;
 				if (successor-> state == CLOSED){
-					propagate_path_improvements(successor);
+					propagate_dijkstra(successor);
 				}
+			}
+		}
+	}		
+}
+
+void find_successors_bfs(Node** board, Node*& current_node, Node*& goal_node){
+	for(int i = 0; i < 4; i++){
+		if(current_node->kids[i]!= NULL){
+			Node* successor = current_node->kids[i];
+
+			if(successor->state == UNKNOWN){
+				successor->parent = current_node;
+
+				open.push_back(successor);
+				if (successor->cell_value != 'A' && successor->cell_value != 'B'){
+					successor->cell_value = '*';	
+				}
+					
+				successor->state = OPEN;	
 			}
 		}
 	}		
@@ -235,5 +289,17 @@ void propagate_path_improvements(Node*& current_node){
 			}
 		}
 	}
+}
 
+
+void propagate_dijkstra(Node*& current_node){
+	for(int i = 0; i < 4; i++){
+		if(current_node->kids[i]!= NULL){
+			if (current_node->g + current_node->kids[i]->cost < current_node->kids[i]->g){
+				current_node->kids[i]->parent = current_node;
+				current_node->kids[i]->g = current_node->g + current_node->kids[i]->cost;
+				propagate_dijkstra(current_node->kids[i]);
+			}
+		}
+	}
 }

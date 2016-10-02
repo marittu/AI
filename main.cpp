@@ -13,7 +13,7 @@ int main(){
 		board[i] = new Node[HEIGTH];
 	}
 
-	getBoard(board, "boards/board-1-1.txt");
+	getBoard(board, "boards/board-2-4.txt");
 
 	cout << "Initial board" << endl;
 	for(int y = 0; y < HEIGTH; y++){
@@ -25,7 +25,7 @@ int main(){
 
 	Node* path;
 
-	path = astar(board)->parent;
+	path = bfs(board)->parent;
 
 	while(path->parent != NULL){
 		path->cell_value = 'o';
