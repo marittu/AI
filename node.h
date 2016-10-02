@@ -2,6 +2,9 @@
 #define NODE_H_INCLUDED
 
 #include <vector>
+#include <list>
+#include <stdlib.h>
+#include <iostream>
 
 #define WIDTH 20
 #define HEIGTH 7
@@ -16,10 +19,11 @@ struct Node{
 	int h;	
 	int cost;
 	char cell_value;
+	Node* kids[4];
 	Node* parent;
 	States state;
 
-	Node() : x(0), y(0), f(0), g(0), h(0), cost(0), cell_value(0), parent(NULL), state(UNKNOWN){}
+	Node() : x(0), y(0), f(0), g(0), h(0), cost(0), cell_value(0), kids({NULL, NULL, NULL, NULL}), parent(NULL), state(UNKNOWN){}
 
 };
 
@@ -30,5 +34,8 @@ Node* astar(Node** board);
 void findStart(Node** board, Node*& current_node, Node*& goal_node);
 int manhatten_distance(Node*& current_node, Node*& goal_node);
 void find_successors(Node** board, Node*& current_node, Node*& goal_node);
+void find_kids(Node** board, Node*& current_node);
+void attatch_and_eval(Node*& successor, Node*& goal_node);
+void propagate_path_improvements(Node*& current_node);
 
 #endif

@@ -7,10 +7,12 @@
 using namespace std;
 
 
+list<Node*> closed;
+list<Node*> open;
+
+
 Node* astar(Node** board){
 
-	list<Node*> closed;
-	list<Node*> open;
 
 	Node* current_node;
 	Node* goal_node;
@@ -31,15 +33,22 @@ Node* astar(Node** board){
 			return NULL;
 		}
 		current_node = *(open.begin());
+		//cout << "current_node " << current_node->x << ", " << current_node->y << endl;	
 		open.remove(current_node);
-		closed.push_front(current_node);
-		current_node->state = CLOSED;
-
+		
 		if(current_node == goal_node){
 			solution = true;
 			return current_node;
 		}
+		
+
+		closed.push_back(current_node);
+		current_node->state = CLOSED;
+
+		
+		find_kids(board, current_node);
 		find_successors(board, current_node, goal_node);
+
 	}
 }
 
@@ -63,41 +72,85 @@ void findStart(Node** board, Node*& current_node, Node*& goal_node){
 	}
 }
 
-void find_successors(Node** board, Node*& current_node, Node*& goal_node){ 
-	Node* successor;
-	successor = &board[current_node->x+1][current_node->y];
-	if (successor->cell_value!='#'){
-		if(successor->state == UNKNOWN){
-			successor->parent = current_node;
-			attatch_and_eval(successor, goal_node);	
-			if (open.empty()){
-				open.push_front(successor);
-			}
-			else{
-				for(auto itterator = open.begin(); itterator != open.end(); ++itterator){
-							if(successor->f < (*itterator)->f ){
-								open.insert(itterator, successor);
-								break;
-							}
-						}
-						open.push_back(successor);
-			}		
+void find_kids(Node** board, Node*& current_node){
+
+	if(current_node->x+1 < WIDTH){ 
+		Node* east = &board[current_node->x+1][current_node->y];
+		if(east->cell_value!='#'){
+			current_node->kids[0] = east;	
 		}
-		else if(successor->cost + parent->g < child->g){
-			successor->parent = current_node;
-			attatch_and_eval(successor, goal_node);
-			for(auto itterator = closed.begin(); itterator != closed.end(); ++itterator){
-				if(successor == *(itterator)){
-					propagate_path_improvements(successor)
+	}
+	if(current_node->y-1 >= 0 ){
+		Node* north = &board[current_node->x][current_node->y-1];
+		if(north->cell_value!='#'){
+			current_node->kids[1] = north;
+		}
+	}
+	if (current_node->x-1 >= 0){
+		Node* west = &board[current_node->x-1][current_node->y];
+		if(west->cell_value!='#'){
+			current_node->kids[2] = west;	
+		}
+	}
+	if( current_node->y+1 < HEIGTH){
+		Node* south = &board[current_node->x][current_node->y+1];
+		if(south->cell_value!='#'){
+			current_node->kids[3] = south;
+		}
+	}
+}
+
+void find_successors(Node** board, Node*& current_node, Node*& goal_node){ 
+	for(int i = 0; i < 4; i++){
+		if(current_node->kids[i]!= NULL){
+			Node* successor = current_node->kids[i];
+
+			if(successor->state == UNKNOWN){
+				successor->parent = current_node;
+				attatch_and_eval(successor, goal_node);
+				if (open.empty()){
+					open.push_back(successor);
+				}
+				else{
+					for(auto itterator = open.begin(); itterator != open.end(); ++itterator){
+						if(successor->f < (*itterator )->f ){
+							open.insert(itterator, successor);
+							break;
+						}
+					}
+					open.push_back((successor));
+				}	
+				successor->state = OPEN;	
+			}
+			else if(successor->cost + current_node->g < successor->g){
+				successor->parent = current_node;
+				attatch_and_eval(successor, goal_node);
+				if (successor-> state == CLOSED){
+					propagate_path_improvements(successor);
 				}
 			}
 		}
-	}
+	}	
 }
 
 void attatch_and_eval(Node*& successor, Node*& goal_node){
 	successor->h = manhatten_distance(successor, goal_node);
 	successor->g = successor->cost + successor->parent->g;
 	successor->f = successor->g + successor->h;
+
+}
+
+
+void propagate_path_improvements(Node*& current_node){
+	for(int i = 0; i < 4; i++){
+		if(current_node->kids[i]!= NULL){
+			if (current_node->g + current_node->kids[i]->cost < current_node->kids[i]->g){
+				current_node->kids[i]->parent = current_node;
+				current_node->kids[i]->g = current_node->g + current_node->kids[i]->cost;
+				current_node->kids[i]->f = current_node->kids[i]->g + current_node->kids[i]->h;
+				propagate_path_improvements(current_node->kids[i]);
+			}
+		}
+	}
 
 }

@@ -12,12 +12,27 @@ int main(){
 
 		board[i] = new Node[HEIGTH];
 	}
-	Node* backtrackingNode;
 
 	getBoard(board, "boards/board-1-4.txt");
-	
-	
 
+	cout << "Initial board" << endl;
+	for(int y = 0; y < HEIGTH; y++){
+		for(int x = 0; x < WIDTH; x++){
+			cout << board[x][y].cell_value;
+		}
+		cout << endl;
+	}
+
+	Node* path;
+
+	path = astar(board)->parent;
+
+	while(path->parent != NULL){
+		path->cell_value = 'x';
+		path = path->parent;
+	}
+	
+	cout << "Solution board" << endl;
 
 	for(int y = 0; y < HEIGTH; y++){
 		for(int x = 0; x < WIDTH; x++){
@@ -27,8 +42,7 @@ int main(){
 	}
 
 
-	astar(board);
-
+	
 	return 0;
 }
 
